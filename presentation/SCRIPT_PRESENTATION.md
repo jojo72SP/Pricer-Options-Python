@@ -1,210 +1,222 @@
-# Script oral guide par le code — Pricer d'options (Joseph)
+# Script oral guidé par le code : Pricer d'options (Joseph)
 
-Chaque ecran suit le meme ordre : **cliquer sur le lien → montrer les lignes indiquees → donner l'explication juste dessous**. Les numeros de ligne correspondent a la version actuelle des fichiers. Prevoir environ 20 minutes avec la demo, a mesurer en repetition.
+Chaque écran suit le même ordre : **cliquer sur le lien → montrer les lignes indiquées → donner l'explication juste dessous**. Les numéros de ligne correspondent à la version actuelle des fichiers. Prévoir environ 25 minutes avec la démo, à mesurer en répétition.
 
-Le fil conducteur : **on suit le chemin d'un prix, du marche jusqu'au portefeuille.**
+Le fil conducteur : **on suit le chemin d'un prix, du marché jusqu'au portefeuille, puis on teste le modèle et on dit ce qu'il ne fait pas.**
 
-## 1. Presenter le projet
+Les valeurs notées « attendu » sont des calculs à la main avec les paramètres : S = K = 100, T = 1, r = 5 %, q = 0, sigma = 20 %. Elles servent de repère : pendant la démo, on vérifie que l'écran les retrouve.
 
-### Ecran 1.1
+## 1. Présenter le projet
+
+### Écran 1.1
 
 **Montrer : [README.md](../README.md) puis l'arborescence du dossier.**
 
-**A dire :**
+**À dire :**
 
-C'est un pricer d'options europeennes. Il recupere le prix spot en temps reel, calcule le prix par Black-Scholes et par Monte Carlo, donne les grecs, et permet de constituer un portefeuille d'options dont on voit le payoff global. L'interface est en Streamlit. Le projet est decoupe en cinq fichiers : les modeles dans Pricer, les donnees de marche dans assets et data_provider, le portefeuille dans book, et l'interface dans pricer_ui.
+C'est un pricer d'options européennes. Il récupère le prix spot, calcule le prix par Black-Scholes et par Monte Carlo, donne les grecs, et permet de constituer un portefeuille dont on voit le payoff global. L'interface est en Streamlit. Le projet est découpé en cinq fichiers : les modèles dans Pricer, les données de marché dans assets et data_provider, le portefeuille dans book, et l'interface dans pricer_ui.
 
-## 2. Donnees de marche
+## 2. Données de marché
 
-### Ecran 2.1
+### Écran 2.1
 
-**Montrer : [assets.py](../assets.py) — le dictionnaire ASSETS.**
+**Montrer : [assets.py](../assets.py) : le dictionnaire ASSETS.**
 
-**A dire :**
+**À dire :**
 
-Chaque sous-jacent a un nom, une devise et un ticker Yahoo Finance. Pour ajouter un actif, on ajoute une entree dans ce dictionnaire. Rien d'autre a changer.
+Chaque sous-jacent a un nom, une devise et un ticker Yahoo Finance. Pour ajouter un actif, on ajoute une entrée dans ce dictionnaire.
 
-### Ecran 2.2
+### Écran 2.2
 
-**Montrer : [data_provider.py](../data_provider.py) — get_spot_price et get_all_prices.**
+**Montrer : [data_provider.py](../data_provider.py) : get_spot_price et get_all_prices.**
 
-**A dire :**
+**À dire :**
 
-`get_spot_price` interroge Yahoo Finance pour un ticker et renvoie le dernier prix. `get_all_prices` fait la meme chose pour tous les actifs du dictionnaire. Limite a connaitre : si Yahoo ne repond pas, l'interface passe en saisie manuelle du prix spot.
+`get_spot_price` interroge Yahoo Finance pour un ticker et renvoie le dernier cours. Pour les indices et les matières premières, il utilise `fast_info`, car `currentPrice` n'existe pas pour ces actifs. `get_all_prices` fait la même chose pour tous les actifs.
 
-### Ecran 2.3
+**Limite à dire clairement :** ces cours sont ceux de Yahoo Finance, gratuits et parfois différés. Ce n'est pas un flux temps réel de salle de marché.
 
-**Montrer : [Pricer.py, lignes 14 a 22](../Pricer.py#L14-L22) — get_market_data.**
+### Écran 2.3
 
-**A dire :**
+**Montrer : [Pricer.py, lignes 14 à 22](../Pricer.py#L14-L22) : get_market_data.**
 
-Ce sont des valeurs de reference pour tester le modele hors ligne. L'interface, elle, utilise le prix spot reel.
+**À dire :**
+
+Ce sont des valeurs de référence pour tester le modèle hors ligne. L'interface utilise le cours réel.
 
 ## 3. Black-Scholes
 
-### Ecran 3.1
+### Écran 3.1
 
-**Montrer : [Pricer.py, lignes 32 a 35](../Pricer.py#L32-L35) — normal_cdf.**
+**Montrer : [Pricer.py, lignes 32 à 35](../Pricer.py#L32-L35) : normal_cdf.**
 
-**A dire :**
+**À dire :**
 
-`normal_cdf` est la fonction de repartition de la loi normale centree reduite. Elle donne la probabilite qu'une variable normale soit inferieure ou egale a x. Black-Scholes en a besoin pour calculer les probabilites d'exercice.
+`normal_cdf` donne la probabilité qu'une variable normale centrée réduite soit inférieure ou égale à x. Black-Scholes s'en sert pour les probabilités d'exercice.
 
-### Ecran 3.2
+### Écran 3.2
 
-**Montrer : [Pricer.py, lignes 37 a 43](../Pricer.py#L37-L43) — black_scholes.**
+**Montrer : [Pricer.py, lignes 37 à 43](../Pricer.py#L37-L43) : black_scholes.**
 
-**A dire :**
+**À dire :**
 
-Premiere ligne : d1 et d2, les deux variables de la formule. Ensuite, le prix d'un call est le spot actualisé avec le dividende, moins le strike actualisé avec le taux. Le put suit la meme logique. C'est un prix ferme : une seule formule, pas de simulation.
+Première ligne : d1 et d2, les deux variables de la formule. Ensuite, le prix d'un call est le spot actualisé avec le dividende, moins le strike actualisé avec le taux. Le put suit la même logique. C'est un prix ferme : une seule formule, pas de simulation.
+
+### Écran 3.3 : Vérification chiffrée
+
+**Montrer : l'écran de l'application, avec S = K = 100, call, sigma 20 %, T = 1, r = 5 %.**
+
+**À dire :**
+
+Le prix Black-Scholes doit donner **10,4506** (attendu). Je le vérifie à la main avec les tables de la loi normale : c'est le même nombre. Pour un call à la monnaie, à un an, c'est un ordre de grandeur cohérent : environ 10 % du spot.
+
+**Attention à la démo :** le champ Strike est pré-rempli avec le cours spot arrondi, donc une option à la monnaie sur l'actif choisi. Il reste modifiable : voir la section 8 pour le DAX, le pétrole et l'or.
 
 ## 4. Monte Carlo
 
-### Ecran 4.1
+### Écran 4.1
 
-**Montrer : [Pricer.py, lignes 47 a 60](../Pricer.py#L47-L60) — monte_carlo.**
+**Montrer : [Pricer.py, lignes 47 à 60](../Pricer.py#L47-L60) : monte_carlo.**
 
-**A dire :**
+**À dire :**
 
-On tire N chemins de prix avec une loi lognormale. Pour chaque chemin, on calcule le payoff a maturité, puis on actualise et on moyenne. La fonction renvoie aussi l'erreur standard : elle mesure la precision du resultat. La graine `seed=2026` rend le tirage reproductible d'une execution a l'autre.
+On tire N chemins de prix avec une loi lognormale. Pour chaque chemin, on calcule le payoff à maturité, puis on actualise et on moyenne. La fonction renvoie aussi l'erreur standard : elle mesure la précision du résultat. La graine `seed=2026` rend le tirage reproductible d'une exécution à l'autre.
 
-### Ecran 4.2
+### Écran 4.2 : Convergence
 
-**A dire (sans montrer le code) :**
+**Montrer : l'application, call à la monnaie. Passer le nombre de chemins de 1 000 à 10 000 puis à 100 000.**
 
-Longstaff-Schwartz est aussi dans le fichier, pour les options americaines. Il n'est pas valide pour l'instant, donc je ne le montre pas aujourd'hui.
+**À dire :**
 
-## 5. Les grecs
+Avec 10 000 trajectoires, le résultat validé est **10,4650 plus ou moins 0,1483** (attendu : 10,4506 pour Black-Scholes, donc à l'intérieur de l'erreur). Quand on multiplie N par 10, l'erreur est divisée par racine de 10, soit environ 3. Le prix converge vers Black-Scholes, mais lentement : c'est le compromis de la méthode.
 
-### Ecran 5.1
+La graine `seed=2026` rend le résultat reproductible : deux lancements donnent le même chiffre.
 
-**Montrer : [Pricer.py, lignes 111 a 116](../Pricer.py#L111-L116) — delta.**
+### Écran 4.3 : Longstaff-Schwartz (sans montrer le code)
 
-**A dire :**
+**À dire :**
 
-Pour rappel: Le delta est la sensibilité du prix au spot. Pour un call, il est situé entre 0 et 1 : une option proche de la monnaie bouge presque comme le sous-jacent. Les autres grecs suivent la meme structure, avec la meme variable d1.
+Longstaff-Schwartz est aussi dans le fichier, pour les options américaines qu'on peut exercer avant l'échéance. Il n'est pas validé pour l'instant : je ne le montre pas aujourd'hui.
 
-### Ecran 5.2
+## 5. Put et call : la parité
 
-**Montrer : [Pricer.py, lignes 118 a 144](../Pricer.py#L118-L144) — gamma, vega, theta, rho.**
+### Écran 5.1 : Parité call-put
 
-**A dire :**
+**Montrer : l'application, même jeu de paramètres, une fois en call, une fois en put.**
 
-Le Gamma mesure la courbure du prix par rapport au spot. Le Vega mesure la sensibilité a la volatilité. le theta mesure combien ton option perd de valeur chaque jour qui passe, toutes choses égales par ailleurs. Le Rho mesure la sensibilité aux taux. On les calcule une fois, a partir de d1 et d2.
+**À dire :**
 
-### Ecran 5.3
+Pour un put à la monnaie, on attend **5,5735** (attendu). Une relation doit toujours être vraie pour des options européennes sans dividende : call moins put égale spot moins strike actualisé.
 
-**Montrer : [Pricer.py, lignes 146 a 155](../Pricer.py#L146-L155) — plot_greeks.**
+Calcul : 10,4506 - 5,5735 = 4,8771, et 100 - 100 x e^(-0,05) = 4,8771. Les deux cotes sont égales. C'est la vérification la plus simple qu'un pricer doit passer.
 
-**A dire :**
+## 6. Les grecs
 
-Les cinq grecs sont tracés sur une grille de spots, de 70 % a 130 % du strike. Le graphique montre comment chaque grec change quand le marche bouge.
+### Écran 6.1 : Delta
 
-## 6. Payoff et point mort
+**Montrer : [Pricer.py, lignes 111 à 116](../Pricer.py#L111-L116) : delta.**
 
-### Ecran 6.1
+**À dire :**
 
-**Montrer : [Pricer.py, lignes 204 a 219](../Pricer.py#L204-L219) — payoff_avec_prime.**
+Le delta est la sensibilité du prix au spot : si le sous-jacent monte de 1, le prix change d'environ delta. Pour un call à la monnaie, on attend **0,637** (attendu). Pour le put, **-0,363** : il baisse quand le spot monte. Le delta du put est le delta du call moins 1.
 
-**A dire :**
+### Écran 6.2 : Gamma, vega, thêta, rho
 
-Le payoff intrinsèque d'un call est max(S - K, 0), celui d'un put max(K - S, 0). La prime est retirée pour l'acheteur, et ajoutée pour le vendeur, qui a le signe inverse.
+**Montrer : [Pricer.py, lignes 118 à 144](../Pricer.py#L118-L144) : gamma, vega, theta, rho.**
 
-### Ecran 6.2
+**À dire :**
 
-**Montrer : [Pricer.py, lignes 221 a 231](../Pricer.py#L221-L231) — get_breakeven.**
+- **Gamma** : la vitesse de variation du delta. À la monnaie, environ **0,019** (attendu). Il est maximal à la monnaie et se réduit quand l'option s'éloigne.
+- **Vega** : la sensibilité à la volatilité. À la monnaie, environ **37,5** (attendu), soit **0,375** pour une hausse d'un point de volatilité. Le vega est le même pour le call et le put.
+- **Thêta** : la perte de valeur quand le temps passe. Pour le call à la monnaie, environ **-6,4 par an**, soit environ **-0,018 par jour**. Le thêta est négatif pour l'acheteur.
+- **Rho** : la sensibilité au taux. Pour le call à la monnaie, environ **+53**. Pour le put, environ **-42**. Le call gagne quand les taux montent, le put perd.
 
-**A dire :**
+### Écran 6.3 : Lire les graphiques
 
-Le point mort est le spot a partir duquel la position est gagnante a maturité. Pour un call acheteur, c'est le strike plus la prime. Pour un put acheteur, c'est le strike moins la prime.
+**Montrer : [Pricer.py, lignes 146 à 155](../Pricer.py#L146-L155) : plot_greeks, puis l'application.**
 
-### Ecran 6.3
+**À dire :**
 
-**Montrer : [Pricer.py, lignes 234 a 259](../Pricer.py#L234-L259) — plot_payoff.**
+Les cinq grecs sont tracés sur des spots de 70 % à 130 % du strike. On voit que le delta passe de 0 à 1, que le gamma et le vega culminent autour du strike, et que le thêta est toujours négatif pour un achat. L'encadré en bas à droite donne les valeurs au cours actuel.
 
-**A dire :**
+## 7. Sensibilités : que se passe-t-il si on change un paramètre
 
-Le graphique montre le payoff intrinsèque en bleu et le profit net, prime deduite, en vert pointillé. Le trait rouge marque le point mort.
+**Montrer : l'application. Changer un seul paramètre à la fois, noter le prix du call et du put.**
 
-## 7. Le book
+**À dire :** on change un paramètre à la fois. Le sens de variation vient de la théorie, la taille de l'effet vient des grecs.
 
-### Ecran 7.1
+| Paramètre augmenté | Call | Put | Pourquoi |
+| --- | --- | --- | --- |
+| Volatilité (sigma) | monte | monte | Plus d'incertitude, plus d'option. Vega positif. |
+| Maturité (T) | monte en général | monte en général | Plus de temps pour que le marché bouge. |
+| Taux (r) | monte | baisse | Le strike est actualisé moins fortement. Rho du call positif, du put négatif. |
+| Strike (K) | baisse | monte | Le call est plus cher quand il est plus facile à exercer. |
+| Spot (S) | monte | baisse | Delta du call positif, du put négatif. |
+| Dividende (q) | baisse | monte | Le dividende fait baisser le cours attendu. |
 
-**Montrer : [book.py, lignes 10 a 19](../book.py#L10-L19) — la classe OptionBook et add_option.**
+**Chiffres à montrer :** une hausse de volatilité de 1 point augmente le call à la monnaie d'environ 0,375. Une hausse de spot de 1 euro augmente le call d'environ 0,64.
 
-**A dire :**
+## 8. Autres sous-jacents
 
-Ici le book est la classe qui garde les options dans un tableau pandas. `add_option` ajoute une ligne avec le sous-jacent, le type, le strike, la maturité, la prime et la quantité.
+### Écran 8.1 : Action, indice, matière première
 
-### Ecran 7.2
+**Montrer : l'application, avec le menu Actif : TTE, DAX, BRENT, OR.**
 
-**Montrer : [book.py, lignes 38 a 47](../book.py#L38-L47) — save_to_csv et load_from_csv.**
+**À dire :**
 
-**A dire :**
+Le modèle est le même pour toutes les classes d'actifs : seul le spot change. Une action et un indice se pricent comme un titre sans dividende ou avec un dividende. Le pétrole et l'or sont traités comme des actifs sans rendement.
 
-Le book est sauvegarde dans un fichier CSV, et relu au lancement. Le fichier n'est pas publie sur GitHub : il contient des positions personnelles.
+**Ce qu'il faut dire honnêtement :**
 
-### Ecran 7.3
+- Le prix d'un DAX est de l'ordre de 20 000 points : le strike doit être dans le même ordre de grandeur. Le champ Strike est pré-rempli avec le cours spot de l'actif choisi, donc il suit le bon ordre de grandeur sans toucher au curseur. Si le spot change, le Strike est recalculé.
+- Le Brent et l'or sont cotés en dollars : le pricer ne convertit pas la devise. Le payoff global du book n'est pas converti en euros non plus.
+- La volatilité est saisie à la main : elle n'est pas calibrée sur le marché. Pour le DAX, la volatilité implicite du marché existe (indice VSTOXX), mais le pricer ne la récupère pas encore.
 
-**Montrer : [book.py, lignes 49 a 59](../book.py#L49-L59) — get_total_payoff.**
+## 9. Payoff, point mort et book
 
-**A dire :**
+### Écran 9.1 : Point mort
 
-Pour chaque ligne du book, on calcule le payoff intrinseque sur la grille de spots, on retire la prime, puis on multiplie par la quantite. On additionne toutes les lignes : c'est le payoff global. Limite a connaitre : le book ne distingue pas encore achat et vente.
+**Montrer : [Pricer.py, lignes 204 à 231](../Pricer.py#L204-L231) : payoff_avec_prime et get_breakeven.**
 
-## 8. L'interface Streamlit
+**À dire :**
 
-### Ecran 8.1
+Le payoff intrinsèque d'un call est max(S - K, 0). On retire la prime pour obtenir le profit net. Le point mort, pour un call acheteur, est le strike plus la prime : 100 + 10,45 = 110,45 pour un call à 10,45 de prime.
 
-**Montrer : [pricer_ui.py, lignes 29 a 50](../pricer_ui.py#L29-L50) — menu PRICER et parametres.**
+### Écran 9.2 : Graphique du payoff
 
-**A dire :**
+**Montrer : [Pricer.py, lignes 234 à 259](../Pricer.py#L234-L259) : plot_payoff.**
 
-Le menu lateral choisit la page. En mode PRICER, on choisit l'actif, puis les parametres : type, strike, maturite, taux, volatilite, dividende, nombre de chemins. Le prix spot est celui recupere en temps reel.
+**À dire :**
 
-### Ecran 8.2
+En bleu, le payoff intrinsèque. En vert pointillé, le profit net. Le trait rouge marque le point mort. Le graphique suit le sens choisi dans la barre latérale. Pour une vente, les courbes sont inversées : le vendeur gagne quand l'acheteur perd.
 
-**Montrer : [pricer_ui.py, lignes 51 a 62](../pricer_ui.py#L51-L62) — calcul et affichage des prix.**
+### Écran 9.3 : Le book
 
-**A dire :**
+**Montrer : [book.py, lignes 14 à 30](../book.py#L14-L30) : OptionBook et add_option.**
 
-A chaque changement d'un parametre, Streamlit relance le script. Black-Scholes et Monte Carlo sont calculés, puis affichés cote a cote avec l'ecart entre les deux.
+**À dire :**
 
-### Ecran 8.3
+Le book garde les options dans un tableau pandas. Chaque ligne a un sous-jacent, un sens (achat ou vente), un type, un strike, une maturité, une prime et une quantité. Si une colonne manque, l'ajout est refusé.
 
-**Montrer : [pricer_ui.py, lignes 79 a 91](../pricer_ui.py#L79-L91) — bouton Ajouter au Book.**
+### Écran 9.4 : Payoff global
 
-**A dire :**
+**Montrer : [book.py, lignes 54 à 65](../book.py#L54-L65) : get_total_payoff, puis [pricer_ui.py, lignes 122 à 136](../pricer_ui.py#L122-L136).**
 
-Le bouton envoie l'option au book, avec le prix Black-Scholes comme prime. Le book est garde en memoire pendant la session.
+**À dire :**
 
-### Ecran 8.4
+Pour chaque ligne, on calcule le payoff intrinsèque sur une grille de spots, on retire la prime, on multiplie par la quantité. Pour une vente, le signe est inversé. On additionne toutes les lignes : c'est le payoff global. Un achat de call et une vente de put donnent deux courbes qui se compensent en partie.
 
-**Montrer : [pricer_ui.py, lignes 93 a 104](../pricer_ui.py#L93-L104) — page BOOK.**
+### Écran 9.5 : Sauvegarde et suppression
 
-**A dire :**
+**Montrer : [book.py, lignes 39 à 52](../book.py#L39-L52) : save_to_csv et load_from_csv, puis [pricer_ui.py, lignes 138 à 148](../pricer_ui.py#L138-L148) : page DELETE.**
 
-La page BOOK affiche le tableau et permet de sauvegarder en CSV. Si le book est vide, un message le signale.
+**À dire :**
 
-### Ecran 8.5
+Le book est sauvegardé en CSV et relu au lancement. Il contient des positions personnelles : le fichier n'est pas publié sur GitHub. On supprime une ligne par son index, celui du tableau BOOK.
 
-**Montrer : [pricer_ui.py, lignes 106 a 120](../pricer_ui.py#L106-L120) — page PAYOFF GLOBAL.**
+## 10. Démo
 
-**A dire :**
-
-Le graphique montre le payoff global du portefeuille sur une grille de spots de 0 a 200. C'est le gain ou la perte total, toutes positions confondues.
-
-### Ecran 8.6
-
-**Montrer : [pricer_ui.py, lignes 122 a 129](../pricer_ui.py#L122-L129) — page DELETE.**
-
-**A dire :**
-
-On choisit l'index d'une ligne, puis on la supprime. Les index sont ceux affiches dans le tableau BOOK.
-
-## 9. Demo
-
-### Ecran 9.1
+### Écran 10.1
 
 **Montrer : le terminal Anaconda Prompt.**
 
@@ -213,18 +225,66 @@ cd C:\Users\willi\.spyder-py3
 streamlit run pricer_ui.py
 ```
 
-**A dire :**
+**À dire :**
 
-Je lance l'interface. Je choisis TTE, je garde les parametres par defaut, je regarde les prix Black-Scholes et Monte Carlo. J'ajoute l'option au book, je passe en BOOK, puis en PAYOFF GLOBAL.
+Je lance l'interface. Je prends un call à la monnaie sur TTE, avec K égal au cours affiché. Je note le prix Black-Scholes et le prix Monte Carlo. Je passe le put : je vérifie la parité. J'ajoute un achat de call, puis une vente de put au book, et je regarde le payoff global.
 
-**Avant la demo : verifier que yfinance repond. Sinon, dire qu'on passe en saisie manuelle du spot.**
+**Avant la démo :**
+- vérifier que yfinance répond (le cours doit s'afficher dans la barre latérale) ;
+- sinon, dire qu'on passe sur un spot saisi à la main ;
+- avoir le tableau de la section 5 et de la section 7 sous les yeux.
 
-## 10. Conclure
+## 11. Conclure : limites et améliorations
 
-### Ecran 10.1
+### Écran 11.1 : Ce que le projet fait
 
-**Montrer : [pricer_ui.py, lignes 75 a 77](../pricer_ui.py#L75-L77) — comparaison BS vs MC, puis le graphique de comparaison.**
+**Montrer : la page PRICER, puis la page PAYOFF GLOBAL.**
 
-**A dire :**
+**À dire :**
 
-Les deux methodes donnent des prix proches. Monte Carlo converge vers Black-Scholes quand le nombre de chemins augmente, et l'erreur standard indique la precision. Les limites sont connues : une volatilite saisie et non calibree, pas d'options americaines validees, et un book sans distinction achat et vente. Les prochaines etapes : valider Longstaff-Schwartz, calibrer la volatilite sur les donnees de marche, et ajouter le sens de la position au book.
+Le pricer calcule des prix européens, les vérifie par deux méthodes, donne les grecs, et gère un portefeuille avec un payoff global. Les résultats sont cohérents : la parité call-put est respectée, Monte Carlo converge vers Black-Scholes.
+
+### Écran 11.2 : Limites
+
+**À dire :**
+
+- **Une seule volatilité** par option, saisie à la main. Un desk utilise une surface de volatilité, calibrée sur les options cotées.
+- **Un taux unique** et plat. Un desk utilise une courbe de taux (swaps ou OIS) pour chaque maturité.
+- **Pas de dividendes discrets** : le dividende est un taux continu. Les dividendes réels sont des montants à des dates précises.
+- **Européen seulement** : Longstaff-Schwartz n'est pas validé.
+- **Monte Carlo lent** : la boucle est en Python pur, pas vectorisée.
+- **Données gratuites** : Yahoo Finance, sans garantie de temps réel.
+- **Pas de devise** : le book ne convertit pas en euros.
+- **Pas de tests automatisés**, pas de validation sur des cotations réelles.
+- **Le book n'est pas un vrai livre de positions** : pas de date de transaction, pas de valorisation dans le temps, pas de P&L historique.
+
+### Écran 11.3 : Améliorations, par ordre de priorité
+
+**À dire :**
+
+1. Convertir le payoff global en euros avec le taux de change du jour.
+2. Valider Longstaff-Schwartz sur un cas connu, puis le comparer à un arbre binomial.
+3. Calibrer la volatilité sur les options cotées, ou au minimum sur la volatilité implicite du marché.
+4. Ajouter des tests automatisés : parité call-put, prix à sigma nul, convergence Monte Carlo.
+5. Vectoriser le Monte Carlo avec numpy pour gagner en vitesse.
+6. Ajouter la date de transaction au book et un suivi de la valeur dans le temps.
+
+### Écran 11.4 : Comparaison avec les pricers de salle de marché
+
+**À dire :**
+
+Un pricer de salle de marché ne se compare pas directement à ce projet : il fait la même chose à une autre échelle et avec d'autres exigences.
+
+| Aspect | Ce projet | Salle de marché |
+| --- | --- | --- |
+| Données de marché | Yahoo Finance, gratuit | Flux professionnel, temps réel, historique contrôlé |
+| Volatilité | Saisie à la main, plate | Surface calibrée par strike et maturité |
+| Taux | Un taux unique | Courbes de taux par devise |
+| Types d'options | Européennes | Américaines, barrières, exotiques |
+| Calcul des grecs | Formules fermées | Bump-and-revalue, différentiation automatique |
+| Vitesse | Python, boucles | C++ ou code vectorisé, parallèle |
+| Contrôle | Aucun test | Validation de modèle, tests de non-régression, audit |
+| Risque | Payoff à maturité | VaR, scénarios de stress, P&L quotidien |
+| Positions | Un fichier CSV | Système de transactions relié à la comptabilité |
+
+**Phrase à retenir :** le projet montre que je comprends la mécanique du pricing et des grecs. Un pricer de salle de marché montre en plus comment on sait qu'un prix est juste, et comment on gère le risque quand le modèle se trompe.

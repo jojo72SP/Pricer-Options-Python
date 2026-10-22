@@ -36,4 +36,4 @@ Depuis Anaconda Prompt, dans le dossier du projet.
 - Un seul pas de temps et une seule volatilite par option (pas de surface de volatilite).
 - La volatilite est saisie, pas calibree sur les donnees de marche.
 - Longstaff-Schwartz est present dans Pricer.py mais n'est pas valide : il n'est pas utilise dans l'interface.
-- Le book ne distingue pas encore achat et vente (sens de la position).
+- Le graphique de payoff de la page PRICER suit le sens choisi (achat ou vente) ; le payoff global du book tient compte de chaque ligne, achat ou vente.

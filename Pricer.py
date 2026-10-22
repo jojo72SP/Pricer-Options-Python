@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-Pricer.py - Modeles de pricing (Black-Scholes, Monte Carlo), grecs et payoffs
+Éditeur de Spyder
+
+Ceci est un script temporaire.
 """
 
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.stats import norm
+from scipy.stats import norm # pour distributon normale
 
 #on commence par le market data
 
@@ -236,7 +238,7 @@ def plot_payoff(S_range, payoffs, K, prime, option_side, option_type):
     payoff_intrinsic = np.array([max(S - K, 0) if option_type == "call" else max(K-S, 0)
                              for S in S_range])
 
-    profit_net = payoff_intrinsic - prime
+    profit_net = payoff_intrinsic - prime if option_side == "acheteur" else prime - payoff_intrinsic
 
     #Graph du payoff intrinseque
 
