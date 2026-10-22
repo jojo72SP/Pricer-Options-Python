@@ -1,0 +1,16 @@
+# On ne publie que les fichiers du projet : tout le reste est ignore
+*
+!.gitignore
+!README.md
+!requirements.txt
+!Pricer.py
+!assets.py
+!data_provider.py
+!book.py
+!pricer_ui.py
+!presentation/
+!presentation/**
+
+# Sauvegardes locales du book (ne pas publier)
+option_book.csv
+__pycache__/
