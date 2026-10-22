@@ -56,7 +56,7 @@ Ce sont des valeurs de reference pour tester le modele hors ligne. L'interface, 
 
 **A dire :**
 
-Premiere ligne : d1 et d2, les deux variables de la formule. Ensuite, le prix d'un call est le spot actualise avec le dividende, moins le strike actualise avec le taux. Le put suit la meme logique. C'est un prix ferme : une seule formule, pas de simulation.
+Premiere ligne : d1 et d2, les deux variables de la formule. Ensuite, le prix d'un call est le spot actualisé avec le dividende, moins le strike actualisé avec le taux. Le put suit la meme logique. C'est un prix ferme : une seule formule, pas de simulation.
 
 ## 4. Monte Carlo
 
@@ -66,7 +66,7 @@ Premiere ligne : d1 et d2, les deux variables de la formule. Ensuite, le prix d'
 
 **A dire :**
 
-On tire N chemins de prix avec une loi lognormale. Pour chaque chemin, on calcule le payoff a maturite, puis on actualise et on moyenne. La fonction renvoie aussi l'erreur standard : elle mesure la precision du resultat. La graine `seed=2026` rend le tirage reproductible d'une execution a l'autre.
+On tire N chemins de prix avec une loi lognormale. Pour chaque chemin, on calcule le payoff a maturité, puis on actualise et on moyenne. La fonction renvoie aussi l'erreur standard : elle mesure la precision du resultat. La graine `seed=2026` rend le tirage reproductible d'une execution a l'autre.
 
 ### Ecran 4.2
 
@@ -82,7 +82,7 @@ Longstaff-Schwartz est aussi dans le fichier, pour les options americaines. Il n
 
 **A dire :**
 
-Le delta est la sensibilite du prix au spot. Pour un call, il est entre 0 et 1 : une option proche de la monnaie bouge presque comme le sous-jacent. Les autres grecs suivent la meme structure, avec la meme variable d1.
+Pour rappel: Le delta est la sensibilité du prix au spot. Pour un call, il est situé entre 0 et 1 : une option proche de la monnaie bouge presque comme le sous-jacent. Les autres grecs suivent la meme structure, avec la meme variable d1.
 
 ### Ecran 5.2
 
@@ -90,7 +90,7 @@ Le delta est la sensibilite du prix au spot. Pour un call, il est entre 0 et 1 :
 
 **A dire :**
 
-Gamma mesure la courbure du prix par rapport au spot. Vega mesure la sensibilite a la volatilite. Theta mesure la decote quand le temps passe. Rho mesure la sensibilite aux taux. On les calcule une fois, a partir de d1 et d2.
+Le Gamma mesure la courbure du prix par rapport au spot. Le Vega mesure la sensibilité a la volatilité. le theta mesure combien ton option perd de valeur chaque jour qui passe, toutes choses égales par ailleurs. Le Rho mesure la sensibilité aux taux. On les calcule une fois, a partir de d1 et d2.
 
 ### Ecran 5.3
 
@@ -98,7 +98,7 @@ Gamma mesure la courbure du prix par rapport au spot. Vega mesure la sensibilite
 
 **A dire :**
 
-Les cinq grecs sont traces sur une grille de spots, de 70 % a 130 % du strike. Le graphique montre comment chaque grec change quand le marche bouge.
+Les cinq grecs sont tracés sur une grille de spots, de 70 % a 130 % du strike. Le graphique montre comment chaque grec change quand le marche bouge.
 
 ## 6. Payoff et point mort
 
@@ -108,7 +108,7 @@ Les cinq grecs sont traces sur une grille de spots, de 70 % a 130 % du strike. L
 
 **A dire :**
 
-Le payoff intrinseque d'un call est max(S - K, 0), celui d'un put max(K - S, 0). La prime est retiree pour l'acheteur, et ajoutee pour le vendeur, qui a le signe inverse.
+Le payoff intrinsèque d'un call est max(S - K, 0), celui d'un put max(K - S, 0). La prime est retirée pour l'acheteur, et ajoutée pour le vendeur, qui a le signe inverse.
 
 ### Ecran 6.2
 
@@ -116,7 +116,7 @@ Le payoff intrinseque d'un call est max(S - K, 0), celui d'un put max(K - S, 0).
 
 **A dire :**
 
-Le point mort est le spot a partir duquel la position est gagnante a maturite. Pour un call acheteur, c'est le strike plus la prime. Pour un put acheteur, c'est le strike moins la prime.
+Le point mort est le spot a partir duquel la position est gagnante a maturité. Pour un call acheteur, c'est le strike plus la prime. Pour un put acheteur, c'est le strike moins la prime.
 
 ### Ecran 6.3
 
@@ -124,7 +124,7 @@ Le point mort est le spot a partir duquel la position est gagnante a maturite. P
 
 **A dire :**
 
-Le graphique montre le payoff intrinseque en bleu et le profit net, prime deduite, en vert pointille. Le trait rouge marque le point mort.
+Le graphique montre le payoff intrinsèque en bleu et le profit net, prime deduite, en vert pointillé. Le trait rouge marque le point mort.
 
 ## 7. Le book
 
@@ -134,7 +134,7 @@ Le graphique montre le payoff intrinseque en bleu et le profit net, prime deduit
 
 **A dire :**
 
-Le book est une classe. Il garde les options dans un tableau pandas. `add_option` ajoute une ligne avec le sous-jacent, le type, le strike, la maturite, la prime et la quantite.
+Ici le book est la classe qui garde les options dans un tableau pandas. `add_option` ajoute une ligne avec le sous-jacent, le type, le strike, la maturité, la prime et la quantité.
 
 ### Ecran 7.2
 
@@ -168,7 +168,7 @@ Le menu lateral choisit la page. En mode PRICER, on choisit l'actif, puis les pa
 
 **A dire :**
 
-A chaque changement d'un parametre, Streamlit relance le script. Black-Scholes et Monte Carlo sont calcules, puis affiches cote a cote avec l'ecart entre les deux.
+A chaque changement d'un parametre, Streamlit relance le script. Black-Scholes et Monte Carlo sont calculés, puis affichés cote a cote avec l'ecart entre les deux.
 
 ### Ecran 8.3
 
