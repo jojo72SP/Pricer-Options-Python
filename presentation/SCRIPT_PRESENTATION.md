@@ -114,22 +114,32 @@ Calcul : 10,4506 - 5,5735 = 4,8771, et 100 - 100 x e^(-0,05) = 4,8771. Les deux 
 
 ### Écran 6.1 : Delta
 
-**Montrer : [Pricer.py, lignes 111 à 116](../Pricer.py#L111-L116) : delta.**
+**Montrer : [Pricer.py, lignes 111 à 116](../Pricer.py#L111-L116) : delta (code), puis l'encadré « Greeks au prix actuel » à l'écran.**
 
-**À dire :**
+**À dire (code) :**
 
-Le delta est la sensibilité du prix au spot : si le sous-jacent monte de 1, le prix change d'environ delta. Pour un call à la monnaie, on attend **0,637** (attendu). Pour le put, **-0,363** : il baisse quand le spot monte. Le delta du put est le delta du call moins 1.
+Le delta est la sensibilité du prix au cours : c'est la dérivée du prix par rapport au spot. Le code applique la formule de Black-Scholes pour le call, puis pour le put.
+
+**À dire (écran) :**
+
+Si le sous-jacent monte de 1 euro, le call change d'environ delta. Pour TTE à 90,96 avec K = 90,96, le delta vaut **0,6368** : si le titre monte de 1 euro, le call gagne environ 0,64 euro. À la monnaie, ce delta reste proche de 0,64 quel que soit le niveau du cours. Pour le put, le delta est négatif : il baisse quand le spot monte. Le delta du put est le delta du call moins 1.
 
 ### Écran 6.2 : Gamma, vega, thêta, rho
 
-**Montrer : [Pricer.py, lignes 118 à 144](../Pricer.py#L118-L144) : gamma, vega, theta, rho.**
+**Montrer : [Pricer.py, lignes 118 à 144](../Pricer.py#L118-L144) : gamma, vega, thêta, rho (code), puis l'encadré de l'écran.**
 
-**À dire :**
+**À dire (code) :**
 
-- **Gamma** : la vitesse de variation du delta. À la monnaie, environ **0,019** (attendu). Il est maximal à la monnaie et se réduit quand l'option s'éloigne.
-- **Vega** : la sensibilité à la volatilité. À la monnaie, environ **37,5** (attendu), soit **0,375** pour une hausse d'un point de volatilité. Le vega est le même pour le call et le put.
-- **Thêta** : la perte de valeur quand le temps passe. Pour le call à la monnaie, environ **-6,4 par an**, soit environ **-0,018 par jour**. Le thêta est négatif pour l'acheteur.
-- **Rho** : la sensibilité au taux. Pour le call à la monnaie, environ **+53**. Pour le put, environ **-42**. Le call gagne quand les taux montent, le put perd.
+Chaque grec est une dérivée du prix : gamma par rapport au cours, vega par rapport à la volatilité, thêta par rapport au temps, rho par rapport au taux. Le code applique la formule de chacun.
+
+**À dire (écran), avec TTE à 90,96 :**
+
+- **Gamma** : **0,0206**. Si le cours monte de 1 euro, le delta augmente d'environ 0,02. Il est maximal près du strike et se réduit quand l'option s'éloigne.
+- **Vega** : **34,13**. Une hausse de 1 point de volatilité (0,01) ajoute environ 0,34 euro au call. Le vega est le même pour le call et le put.
+- **Thêta** : environ **-5,7 par an**, soit environ -0,016 euro par jour. L'acheteur perd de la valeur à mesure que le temps passe.
+- **Rho** : **48,43**. Une hausse de 1 point de taux (0,01) ajoute environ 0,48 euro au call. Le put a un rho négatif : il perd quand les taux montent.
+
+**Rappel :** les valeurs « attendues » de la version précédente étaient calculées pour S = K = 100. Pour la démo, on lit les valeurs à l'écran.
 
 ### Écran 6.3 : Lire les graphiques
 
